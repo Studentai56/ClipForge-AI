@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClipForge AI - Free Script to Video Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0d10;
+      --panel: #151a20;
+      --panel-2: #1c222a;
+      --line: #2b333d;
+      --text: #f4f8fb;
+      --muted: #9eaebc;
+      --soft: #cbd7e2;
+      --aqua: #51d8bf;
+      --amber: #f5b34d;
+      --rose: #f06c86;
+      --blue: #6fb8ff;
+      --green: #79dc8f;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.34);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(26, 31, 37, 0.96), rgba(9, 11, 14, 1) 58%),
+        #0b0d10;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(1720px, 100%);
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: rgba(16, 20, 25, 0.88);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--aqua), var(--amber));
+      color: #111820;
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .brand h1 {
+      font-size: clamp(1.05rem, 1.5vw, 1.38rem);
+      margin: 0;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .status-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill,
+    .metric {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--soft);
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .pill.good {
+      border-color: rgba(81, 216, 191, 0.36);
+      color: #d7fff7;
+      background: rgba(81, 216, 191, 0.12);
+    }
+
+    .primary-action,
+    .secondary-action,
+    .ghost-action,
+    .icon-action {
+      min-height: 42px;
+      border-radius: var(--radius);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 750;
+      color: var(--text);
+    }
+
+    .primary-action {
+      padding: 0 15px;
+      background: linear-gradient(135deg, var(--aqua), #75b8ff);
+      color: #071211;
+      box-shadow: 0 14px 36px rgba(81, 216, 191, 0.2);
+    }
+
+    .secondary-action {
+      padding: 0 13px;
+      background: #232b34;
+      border: 1px solid var(--line);
+    }
+
+    .ghost-action {
+      padding: 0 12px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--soft);
+    }
+
+    .icon-action {
+      width: 42px;
+      padding: 0;
+      background: #20272f;
+      border: 1px solid var(--line);
+      color: var(--soft);
+      font-size: 1rem;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(280px, 380px) minmax(420px, 1fr) minmax(280px, 360px);
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .panel,
+    .preview-shell,
+    .gallery-band {
+      border: 1px solid var(--line);
+      background: rgba(19, 23, 28, 0.92);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 14px;
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.15;
+    }
+
+    .panel-title span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      color: var(--soft);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    textarea,
+    input[type="text"],
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #0f1318;
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 11px 12px;
+      outline: 0;
+    }
+
+    textarea {
+      min-height: 188px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: rgba(81, 216, 191, 0.78);
+      box-shadow: 0 0 0 3px rgba(81, 216, 191, 0.12);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 5px;
+      background: #0f1318;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .segmented button {
+      min-height: 34px;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 750;
+    }
+
+    .segmented button.active {
+      background: #24303a;
+      color: var(--text);
+    }
+
+    .voice-list,
+    .scene-list,
+    .tool-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .choice,
+    .scene-card,
+    .tool-row {
+      border: 1px solid var(--line);
+      background: #10151b;
+      border-radius: var(--radius);
+      padding: 10px;
+    }
+
+    .choice {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .choice input,
+    .tool-row input[type="checkbox"] {
+      accent-color: var(--aqua);
+    }
+
+    .choice strong,
+    .scene-card strong,
+    .tool-row strong {
+      display: block;
+      font-size: 0.86rem;
+    }
+
+    .choice small,
+    .scene-card small,
+    .tool-row small {
+      color: var(--muted);
+      font-size: 0.73rem;
+    }
+
+    .meter {
+      display: flex;
+      gap: 3px;
+      align-items: end;
+      height: 24px;
+    }
+
+    .meter span {
+      display: block;
+      width: 4px;
+      border-radius: 3px;
+      background: var(--aqua);
+    }
+
+    .meter span:nth-child(1) { height: 8px; }
+    .meter span:nth-child(2) { height: 16px; background: var(--amber); }
+    .meter span:nth-child(3) { height: 22px; background: var(--blue); }
+    .meter span:nth-child(4) { height: 12px; background: var(--rose); }
+
+    .preview-shell {
+      overflow: hidden;
+    }
+
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .preview-head h2 {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .video-stage {
+      padding: 14px;
+    }
+
+    .canvas {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius);
+      background: #030506;
+      border: 1px solid #303944;
+    }
+
+    .canvas img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 900ms ease, filter 300ms ease;
+    }
+
+    .canvas.playing img {
+      transform: scale(1.035);
+    }
+
+    .canvas .safe-title {
+      position: absolute;
+      left: 4%;
+      top: 5%;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .canvas .badge {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(8, 12, 16, 0.68);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+      color: #fff;
+    }
+
+    .subtitle {
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      bottom: 8%;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+      font-weight: 800;
+      font-size: clamp(0.9rem, 2.1vw, 1.55rem);
+      line-height: 1.24;
+    }
+
+    .watermark-free {
+      position: absolute;
+      right: 4%;
+      bottom: 5%;
+      color: #dffef8;
+      font-size: clamp(0.64rem, 1vw, 0.76rem);
+      background: rgba(5, 12, 14, 0.58);
+      border: 1px solid rgba(81, 216, 191, 0.38);
+      border-radius: 999px;
+      padding: 6px 9px;
+    }
+
+    .render-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(5, 8, 11, 0.72);
+      backdrop-filter: blur(6px);
+    }
+
+    .render-overlay.active {
+      display: grid;
+    }
+
+    .render-box {
+      width: min(460px, calc(100% - 36px));
+      padding: 18px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(19, 24, 29, 0.88);
+    }
+
+    .render-box strong {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .progress span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--aqua), var(--amber), var(--rose));
+      transition: width 240ms ease;
+    }
+
+    .stage-footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .transport {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .timecode {
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+
+    .timeline {
+      border-top: 1px solid var(--line);
+      padding: 14px;
+      background: #11161c;
+    }
+
+    .tracks {
+      display: grid;
+      gap: 8px;
+      position: relative;
+    }
+
+    .track {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .track label {
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .clips {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 1fr 1.3fr;
+      gap: 6px;
+      min-height: 34px;
+    }
+
+    .clip {
+      min-width: 0;
+      border-radius: 6px;
+      padding: 8px;
+      color: #071211;
+      font-size: 0.72rem;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .clip.video { background: var(--aqua); }
+    .clip.voice { background: var(--blue); }
+    .clip.music { background: var(--amber); }
+    .clip.subs { background: var(--rose); color: #fff; }
+
+    .playhead {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 22%;
+      width: 2px;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.12);
+      pointer-events: none;
+    }
+
+    .right-stack,
+    .left-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .sliders {
+      display: grid;
+      gap: 12px;
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 86px 1fr 42px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--aqua);
+    }
+
+    .upload {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 48px;
+      padding: 10px;
+      border: 1px dashed #3a4652;
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: #0f1318;
+      overflow: hidden;
+    }
+
+    .upload input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .scene-card {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .scene-card.active {
+      border-color: rgba(81, 216, 191, 0.7);
+      box-shadow: 0 0 0 3px rgba(81, 216, 191, 0.1);
+    }
+
+    .scene-card img,
+    .gallery-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .tool-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 40;
+      width: min(360px, calc(100vw - 36px));
+      display: grid;
+      gap: 8px;
+    }
+
+    .toast div {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(21, 26, 32, 0.94);
+      color: var(--text);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      animation: rise 220ms ease;
+    }
+
+    @keyframes rise {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .gallery-band {
+      margin-top: 16px;
+      padding: 14px;
+    }
+
+    .gallery-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .gallery-head h2 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .gallery-card {
+      border: 1px solid var(--line);
+      background: #10151b;
+      border-radius: var(--radius);
+      padding: 10px;
+    }
+
+    .gallery-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.86rem;
+    }
+
+    .gallery-card small {
+      color: var(--muted);
+      font-size: 0.74rem;
+    }
+
+    .mobile-tabs {
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .mobile-tabs button {
+      min-height: 38px;
+      border-radius: var(--radius);
+      background: #171d24;
+      color: var(--muted);
+      border: 1px solid var(--line);
+      font-weight: 750;
+    }
+
+    .mobile-tabs button.active {
+      color: var(--text);
+      border-color: rgba(81, 216, 191, 0.65);
+    }
+
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: 330px 1fr;
+      }
+
+      .right-stack {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        padding: 10px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .status-row,
+      .preview-actions {
+        justify-content: flex-start;
+      }
+
+      .mobile-tabs {
+        display: grid;
+      }
+
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .left-stack,
+      .right-stack {
+        display: none;
+      }
+
+      .left-stack.mobile-on,
+      .right-stack.mobile-on,
+      .preview-shell.mobile-on {
+        display: grid;
+      }
+
+      .preview-shell {
+        display: none;
+      }
+
+      .grid-2,
+      .right-stack,
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .track {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">CF</div>
+        <div>
+          <h1>ClipForge AI Studio</h1>
+          <p>Script to polished video, with free HD export and no watermark.</p>
+        </div>
+      </div>
+      <div class="status-row" aria-label="Plan status">
+        <span class="pill good">Unlimited free</span>
+        <span class="pill">0 credits used</span>
+        <span class="pill">No premium plans</span>
+      </div>
+      <button class="primary-action" id="downloadTop" type="button">Download 1080p</button>
+    </header>
+
+    <nav class="mobile-tabs" aria-label="Workspace sections">
+      <button class="active" type="button" data-tab="create">Create</button>
+      <button type="button" data-tab="preview">Preview</button>
+      <button type="button" data-tab="edit">Edit</button>
+    </nav>
+
+    <section class="workspace">
+      <aside class="left-stack mobile-on" data-section="create">
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Script to Video</h2>
+            <span id="wordCount">0 words</span>
+          </div>
+          <div class="field">
+            <label for="scriptInput">Script</label>
+            <textarea id="scriptInput">Launch a free AI video maker for creators, students, and businesses. Paste a script, choose a voice, and generate a clean video with subtitles, music, sound effects, transitions, and HD export. No watermarks, no credits, no limits.</textarea>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="languageSelect">Language</label>
+              <select id="languageSelect">
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Hindi + English</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="formatSelect">Format</label>
+              <select id="formatSelect">
+                <option>16:9 YouTube</option>
+                <option>9:16 Shorts</option>
+                <option>1:1 Social</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Mood</label>
+            <div class="segmented" id="moodTabs">
+              <button class="active" type="button" data-mood="Cinematic">Cinematic</button>
+              <button type="button" data-mood="Energetic">Energetic</button>
+              <button type="button" data-mood="Calm">Calm</button>
+            </div>
+          </div>
+          <button class="primary-action" id="generateBtn" type="button" style="width: 100%;">Generate Video</button>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>AI Voice-Over</h2>
+            <span id="voiceStatus">Natural</span>
+          </div>
+          <div class="voice-list">
+            <label class="choice">
+              <input type="radio" name="voice" value="Aarav" checked>
+              <span><strong>Aarav</strong><small>Hindi and English male voice</small></span>
+              <span class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="voice" value="Meera">
+              <span><strong>Meera</strong><small>Warm female narration</small></span>
+              <span class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            </label>
+            <label class="choice">
+              <input type="radio" name="voice" value="Ryan">
+              <span><strong>Ryan</strong><small>Global English presenter</small></span>
+              <span class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Music and Effects</h2>
+            <span id="audioMatch">Auto matched</span>
+          </div>
+          <div class="field">
+            <label for="musicSelect">Background music</label>
+            <select id="musicSelect">
+              <option>Cinematic Pulse</option>
+              <option>Fresh Startup Beat</option>
+              <option>Soft Documentary Bed</option>
+              <option>Newsroom Rhythm</option>
+            </select>
+          </div>
+          <div class="upload">
+            <span id="audioName">Upload custom audio</span>
+            <strong>Audio</strong>
+            <input id="audioUpload" type="file" accept="audio/*">
+          </div>
+        </section>
+      </aside>
+
+      <section class="preview-shell" data-section="preview">
+        <div class="preview-head">
+          <div>
+            <h2 id="projectTitle">Untitled AI Video</h2>
+            <span class="timecode" id="renderMeta">1080p - 45 sec - autosaved</span>
+          </div>
+          <div class="preview-actions">
+            <button class="icon-action" type="button" id="prevScene" title="Previous scene">I&lt;</button>
+            <button class="icon-action" type="button" id="playBtn" title="Play preview">&gt;</button>
+            <button class="icon-action" type="button" id="nextScene" title="Next scene">&gt;I</button>
+            <button class="secondary-action" type="button" id="saveGallery">Save</button>
+          </div>
+        </div>
+        <div class="video-stage">
+          <div class="canvas" id="canvas">
+            <img id="previewImage" src="assets/scene-startup.png" alt="Generated video preview">
+            <div class="safe-title">
+              <span class="badge" id="sceneBadge">Scene 1</span>
+              <span class="badge" id="voiceBadge">Voice: Aarav</span>
+              <span class="badge" id="moodBadge">Cinematic</span>
+            </div>
+            <div class="subtitle" id="subtitleText">Paste a script, choose a voice, and generate a clean video with subtitles.</div>
+            <div class="watermark-free">No watermark</div>
+            <div class="render-overlay" id="renderOverlay">
+              <div class="render-box">
+                <strong id="renderLabel">Generating scenes...</strong>
+                <div class="progress"><span id="progressBar"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="stage-footer">
+            <div class="transport">
+              <span class="metric" id="sceneCount">4 scenes</span>
+              <span class="metric" id="subtitleStatus">Auto subtitles on</span>
+              <span class="metric" id="musicStatus">SFX synced</span>
+            </div>
+            <span class="timecode" id="timeCode">00:00 / 00:45</span>
+          </div>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="tracks">
+            <div class="playhead" id="playhead"></div>
+            <div class="track">
+              <label>Video</label>
+              <div class="clips"><span class="clip video">Intro</span><span class="clip video">B-roll</span><span class="clip video">Product</span><span class="clip video">CTA</span></div>
+            </div>
+            <div class="track">
+              <label>Voice</label>
+              <div class="clips"><span class="clip voice">Narration</span><span class="clip voice">Pause</span><span class="clip voice">Narration</span><span class="clip voice">Outro</span></div>
+            </div>
+            <div class="track">
+              <label>Audio</label>
+              <div class="clips"><span class="clip music">Music bed</span><span class="clip music">Whoosh</span><span class="clip music">Rise</span><span class="clip music">Hit</span></div>
+            </div>
+            <div class="track">
+              <label>Subs</label>
+              <div class="clips"><span class="clip subs">Auto captions</span><span class="clip subs">Hindi</span><span class="clip subs">English</span><span class="clip subs">Karaoke</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-stack" data-section="edit">
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Editing Panel</h2>
+            <span>Live controls</span>
+          </div>
+          <div class="sliders">
+            <div class="range-row">
+              <span>Trim start</span>
+              <input type="range" min="0" max="20" value="2" data-output="trimStart">
+              <strong id="trimStart">2s</strong>
+            </div>
+            <div class="range-row">
+              <span>Trim end</span>
+              <input type="range" min="20" max="90" value="45" data-output="trimEnd">
+              <strong id="trimEnd">45s</strong>
+            </div>
+            <div class="range-row">
+              <span>Filter</span>
+              <input type="range" min="0" max="100" value="36" data-output="filterValue">
+              <strong id="filterValue">36</strong>
+            </div>
+          </div>
+          <div class="tool-list" style="margin-top: 12px;">
+            <label class="tool-row">
+              <input type="checkbox" checked>
+              <span><strong>Auto subtitles</strong><small>Word synced captions</small></span>
+              <span class="pill good">On</span>
+            </label>
+            <label class="tool-row">
+              <input type="checkbox" checked>
+              <span><strong>Smart transitions</strong><small>Scene-aware motion</small></span>
+              <span class="pill">6</span>
+            </label>
+            <label class="tool-row">
+              <input type="checkbox">
+              <span><strong>Brand logo layer</strong><small>Upload below</small></span>
+              <span class="pill">PNG</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Scenes</h2>
+            <span id="activeSceneLabel">Scene 1</span>
+          </div>
+          <div class="scene-list" id="sceneList"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <h2>Brand and Export</h2>
+            <span>HD ready</span>
+          </div>
+          <div class="field">
+            <label for="titleInput">Video title</label>
+            <input id="titleInput" type="text" value="Unlimited Free AI Video Maker">
+          </div>
+          <div class="upload">
+            <span id="logoName">Upload logo</span>
+            <strong>Logo</strong>
+            <input id="logoUpload" type="file" accept="image/*">
+          </div>
+          <div class="grid-2" style="margin-top: 12px;">
+            <button class="secondary-action" id="saveProject" type="button">Auto-save now</button>
+            <button class="primary-action" id="downloadBtn" type="button">Download HD</button>
+          </div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="gallery-band">
+      <div class="gallery-head">
+        <h2>Gallery</h2>
+        <span class="pill good">Autosave enabled</span>
+      </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <article class="gallery-card">
+          <img src="assets/scene-startup.png" alt="Gallery video thumbnail">
+          <strong>Unlimited Free AI Video Maker</strong>
+          <small>1080p - no watermark - saved</small>
+        </article>
+        <article class="gallery-card">
+          <img src="assets/scene-education.png" alt="Gallery video thumbnail">
+          <strong>Course Promo</strong>
+          <small>English voice - subtitles</small>
+        </article>
+        <article class="gallery-card">
+          <img src="assets/scene-health.png" alt="Gallery video thumbnail">
+          <strong>Wellness Reel</strong>
+          <small>Calm mood - music bed</small>
+        </article>
+        <article class="gallery-card">
+          <img src="assets/scene-news.png" alt="Gallery video thumbnail">
+          <strong>Daily Brief</strong>
+          <small>Hindi + English - SFX</small>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script>
+    const sceneAssets = [
+      "assets/scene-startup.png",
+      "assets/scene-education.png",
+      "assets/scene-health.png",
+      "assets/scene-news.png"
+    ];
+
+    const state = {
+      mood: "Cinematic",
+      activeScene: 0,
+      scenes: [],
+      playing: false,
+      playTimer: null
+    };
+
+    const scriptInput = document.querySelector("#scriptInput");
+    const wordCount = document.querySelector("#wordCount");
+    const generateBtn = document.querySelector("#generateBtn");
+    const previewImage = document.querySelector("#previewImage");
+    const subtitleText = document.querySelector("#subtitleText");
+    const sceneBadge = document.querySelector("#sceneBadge");
+    const voiceBadge = document.querySelector("#voiceBadge");
+    const moodBadge = document.querySelector("#moodBadge");
+    const sceneList = document.querySelector("#sceneList");
+    const renderOverlay = document.querySelector("#renderOverlay");
+    const progressBar = document.querySelector("#progressBar");
+    const renderLabel = document.querySelector("#renderLabel");
+    const titleInput = document.querySelector("#titleInput");
+    const projectTitle = document.querySelector("#projectTitle");
+    const galleryGrid = document.querySelector("#galleryGrid");
+    const canvas = document.querySelector("#canvas");
+    const playhead = document.querySelector("#playhead");
+    const playBtn = document.querySelector("#playBtn");
+    const timeCode = document.querySelector("#timeCode");
+
+    function splitScript() {
+      const raw = scriptInput.value.trim();
+      const sentences = raw
+        .split(/(?<=[.!?])\s+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      const fallback = [
+        "Create a professional video from your script.",
+        "Add natural voice-over, music, subtitles, and transitions.",
+        "Export in HD with no watermark."
+      ];
+      const source = sentences.length ? sentences : fallback;
+      return source.slice(0, 6).map((text, index) => ({
+        title: index === 0 ? "Opening hook" : index === source.length - 1 ? "Final frame" : `Scene ${index + 1}`,
+        text,
+        asset: sceneAssets[index % sceneAssets.length],
+        duration: index === 0 ? 8 : 11
+      }));
+    }
+
+    function updateWordCount() {
+      const words = scriptInput.value.trim().split(/\s+/).filter(Boolean).length;
+      wordCount.textContent = `${words} words`;
+    }
+
+    function activeVoice() {
+      return document.querySelector("input[name='voice']:checked").value;
+    }
+
+    function renderScenes() {
+      sceneList.innerHTML = "";
+      state.scenes.forEach((scene, index) => {
+        const card = document.createElement("button");
+        card.type = "button";
+        card.className = `scene-card${index === state.activeScene ? " active" : ""}`;
+        card.innerHTML = `
+          <img src="${scene.asset}" alt="">
+          <span><strong>${scene.title}</strong><small>${scene.text}</small></span>
+        `;
+        card.addEventListener("click", () => setScene(index));
+        sceneList.appendChild(card);
+      });
+      document.querySelector("#sceneCount").textContent = `${state.scenes.length} scenes`;
+    }
+
+    function setScene(index) {
+      state.activeScene = (index + state.scenes.length) % state.scenes.length;
+      const scene = state.scenes[state.activeScene];
+      previewImage.src = scene.asset;
+      subtitleText.textContent = scene.text;
+      sceneBadge.textContent = `Scene ${state.activeScene + 1}`;
+      voiceBadge.textContent = `Voice: ${activeVoice()}`;
+      moodBadge.textContent = state.mood;
+      document.querySelector("#activeSceneLabel").textContent = `Scene ${state.activeScene + 1}`;
+      playhead.style.left = `${12 + (state.activeScene / Math.max(state.scenes.length - 1, 1)) * 74}%`;
+      timeCode.textContent = `00:${String(state.activeScene * 11).padStart(2, "0")} / 00:45`;
+      renderScenes();
+    }
+
+    function showToast(message) {
+      const toast = document.querySelector("#toast");
+      const item = document.createElement("div");
+      item.textContent = message;
+      toast.appendChild(item);
+      window.setTimeout(() => item.remove(), 3200);
+    }
+
+    function generateVideo() {
+      state.scenes = splitScript();
+      state.activeScene = 0;
+      renderOverlay.classList.add("active");
+      progressBar.style.width = "0%";
+      const steps = [
+        "Writing shot list...",
+        "Casting AI voice-over...",
+        "Matching music and SFX...",
+        "Creating subtitles...",
+        "Rendering 1080p preview..."
+      ];
+      let step = 0;
+      const timer = window.setInterval(() => {
+        step += 1;
+        progressBar.style.width = `${Math.min(step * 24, 100)}%`;
+        renderLabel.textContent = steps[Math.min(step - 1, steps.length - 1)];
+        if (step >= steps.length) {
+          window.clearInterval(timer);
+          window.setTimeout(() => {
+            renderOverlay.classList.remove("active");
+            setScene(0);
+            showToast("Video generated and autosaved to gallery.");
+          }, 340);
+        }
+      }, 360);
+    }
+
+    function saveToGallery() {
+      const article = document.createElement("article");
+      article.className = "gallery-card";
+      article.innerHTML = `
+        <img src="${state.scenes[state.activeScene].asset}" alt="Saved video thumbnail">
+        <strong>${titleInput.value || "AI Video"}</strong>
+        <small>1080p - no watermark - unlimited free</small>
+      `;
+      galleryGrid.prepend(article);
+      showToast("Project saved to gallery.");
+    }
+
+    function downloadProject() {
+      const payload = [
+        "ClipForge AI Studio export",
+        `Title: ${titleInput.value || "AI Video"}`,
+        `Voice: ${activeVoice()}`,
+        `Mood: ${state.mood}`,
+        `Language: ${document.querySelector("#languageSelect").value}`,
+        "Resolution: 1080p",
+        "Watermark: none",
+        "",
+        "Scenes:",
+        ...state.scenes.map((scene, index) => `${index + 1}. ${scene.text}`)
+      ].join("\n");
+      const blob = new Blob([payload], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "clipforge-ai-1080p-render.txt";
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("HD export package downloaded.");
+    }
+
+    function togglePlay() {
+      state.playing = !state.playing;
+      canvas.classList.toggle("playing", state.playing);
+      playBtn.textContent = state.playing ? "II" : ">";
+      if (!state.playing) {
+        window.clearInterval(state.playTimer);
+        return;
+      }
+      state.playTimer = window.setInterval(() => {
+        setScene(state.activeScene + 1);
+      }, 1600);
+    }
+
+    document.querySelectorAll("#moodTabs button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("#moodTabs button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        state.mood = button.dataset.mood;
+        moodBadge.textContent = state.mood;
+        document.querySelector("#audioMatch").textContent = `${state.mood} match`;
+      });
+    });
+
+    document.querySelectorAll("input[name='voice']").forEach((radio) => {
+      radio.addEventListener("change", () => {
+        voiceBadge.textContent = `Voice: ${activeVoice()}`;
+        document.querySelector("#voiceStatus").textContent = activeVoice();
+      });
+    });
+
+    document.querySelectorAll("input[type='range']").forEach((range) => {
+      range.addEventListener("input", () => {
+        const output = document.querySelector(`#${range.dataset.output}`);
+        output.textContent = range.dataset.output === "trimEnd" || range.dataset.output === "trimStart"
+          ? `${range.value}s`
+          : range.value;
+        const filter = document.querySelector("#filterValue").textContent;
+        previewImage.style.filter = `contrast(${1 + filter / 300}) saturate(${1 + filter / 220})`;
+      });
+    });
+
+    document.querySelectorAll("input[type='file']").forEach((input) => {
+      input.addEventListener("change", () => {
+        const label = input.id === "audioUpload" ? document.querySelector("#audioName") : document.querySelector("#logoName");
+        label.textContent = input.files[0] ? input.files[0].name : label.textContent;
+        showToast(input.id === "audioUpload" ? "Custom audio attached." : "Logo layer attached.");
+      });
+    });
+
+    document.querySelectorAll(".mobile-tabs button").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".mobile-tabs button").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+        document.querySelectorAll("[data-section]").forEach((section) => section.classList.remove("mobile-on"));
+        document.querySelector(`[data-section='${button.dataset.tab}']`).classList.add("mobile-on");
+      });
+    });
+
+    scriptInput.addEventListener("input", updateWordCount);
+    titleInput.addEventListener("input", () => projectTitle.textContent = titleInput.value || "Untitled AI Video");
+    generateBtn.addEventListener("click", generateVideo);
+    document.querySelector("#prevScene").addEventListener("click", () => setScene(state.activeScene - 1));
+    document.querySelector("#nextScene").addEventListener("click", () => setScene(state.activeScene + 1));
+    playBtn.addEventListener("click", togglePlay);
+    document.querySelector("#saveGallery").addEventListener("click", saveToGallery);
+    document.querySelector("#saveProject").addEventListener("click", saveToGallery);
+    document.querySelector("#downloadBtn").addEventListener("click", downloadProject);
+    document.querySelector("#downloadTop").addEventListener("click", downloadProject);
+    document.querySelector("#musicSelect").addEventListener("change", (event) => {
+      document.querySelector("#musicStatus").textContent = event.target.value;
+    });
+
+    state.scenes = splitScript();
+    updateWordCount();
+    projectTitle.textContent = titleInput.value;
+    renderScenes();
+    setScene(0);
+  </script>
+</body>
+</html>
