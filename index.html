@@ -1312,3 +1312,122 @@
   </script>
 </body>
 </html>
+<!-- Add this before the </main> tag in index.html -->
+<div id="settingsModal" class="render-overlay">
+  <div class="render-box" style="background: var(--panel); border: 1px solid var(--line); width: 400px;">
+    <div class="panel-title">
+      <h2>API Settings</h2>
+      <button class="icon-action" onclick="toggleSettings()" style="height:30px; width:30px;">×</button>
+    </div>
+    <div class="field">
+      <label>OpenAI API Key</label>
+      <input type="password" id="openaiKey" placeholder="sk-...">
+    </div>
+    <div class="field">
+      <label>ElevenLabs API Key (Optional)</label>
+      <input type="password" id="elevenKey" placeholder="Enter key...">
+    </div>
+    <button class="primary-action" onclick="saveSettings()" style="width: 100%;">Save Configuration</button>
+  </div>
+</div>
+<!-- Add a settings button in the topbar -->
+<!-- Replace the .status-row content or add next to it -->
+<button class="icon-action" onclick="toggleSettings()" title="Settings">⚙️</button>
+const state = {
+    openaiKey: localStorage.getItem('openaiKey') || '',
+    elevenKey: localStorage.getItem('elevenKey') || '',
+    scenes: [],
+    isGenerating: false
+};
+
+function toggleSettings() {
+    document.getElementById('settingsModal').classList.toggle('active');
+}
+
+function saveSettings() {
+    state.openaiKey = document.getElementById('openaiKey').value;
+    state.elevenKey = document.getElementById('elevenKey').value;
+    localStorage.setItem('openaiKey', state.openaiKey);
+    localStorage.setItem('elevenKey', state.elevenKey);
+    toggleSettings();
+    showToast("Settings Saved!");
+}
+
+// Real API Integration for Scene Generation
+async function generateRealScenes(script) {
+    if (!state.openaiKey) {
+        showToast("Please add OpenAI Key in Settings");
+        return null;
+    }
+
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${state.openaiKey}`
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: [{
+                    role: "system",
+                    content: "Split this script into scenes. For each scene, provide: 1. Subtitle text, 2. A visual description for an image generator. Return as JSON array: [{subtitle: '', prompt: ''}]"
+                }, {
+                    role: "user",
+                    content: script
+                }]
+            })
+        });
+        
+        const data = await response.json();
+        return JSON.parse(data.choices[0].message.content);
+    } catch (e) {
+        console.error(e);
+        showToast("AI Generation Failed");
+        return null;
+    }
+}
+
+// Update the Generate Button Listener
+document.getElementById('generateBtn').addEventListener('click', async () => {
+    const script = document.getElementById('scriptInput').value;
+    if (state.openaiKey) {
+        renderOverlay.classList.add('active');
+        renderLabel.innerText = "Consulting AI Brain...";
+        
+        const scenes = await generateRealScenes(script);
+        if (scenes) {
+            // Here you would proceed to generate images via DALL-E
+            // For now, let's map them to the UI
+            renderLabel.innerText = "Painting Scenes...";
+            state.scenes = scenes.map((s, i) => ({
+                id: i,
+                text: s.subtitle,
+                image: "assets/scene-startup.png", // Replace with real DALL-E URL in next step
+                prompt: s.prompt
+            }));
+            updateUI();
+        }
+        renderOverlay.classList.remove('active');
+    } else {
+        // Fallback to original mock behavior
+        startMockGeneration();
+    }
+});
+.panel {
+    background: rgba(21, 26, 32, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.primary-action {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 42px rgba(81, 216, 191, 0.3);
+}
+.canvas {
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--line);
+}
